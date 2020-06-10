@@ -12,7 +12,7 @@ import router              from "./routes.ts"
 
 // ##################################################################
 // ## Variable declaration
-const port = 8080
+const port = Deno.env.get("PORT") || 8080
 const app  = new Application()
 
 
@@ -24,5 +24,5 @@ app.use(router.allowedMethods())
 // ##################################################################
 console.log (`Server runnig on port ${port}`)
 
-await app.listen ({ port })
+await app.listen ({ port: +port })
 

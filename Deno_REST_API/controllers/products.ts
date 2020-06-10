@@ -21,7 +21,7 @@ let products: Product[] = [
         price           : 19.99,
     },
     {
-        id              : '2',
+        id              : '3',
         name            : "Product Three",
         description     : "This is product three",
         price           : 19.99,
@@ -65,7 +65,7 @@ const getProduct = ({ params, response }: { params: { id: string }, response: an
 
 // @desc    Add product
 // @route   POST /api/v1/products
-const addProduct = async ({ request, response }: { request: any, response: any }) = > {
+const addProduct = async ({ request, response }: { request: any, response: any }) => {
     const body   = await request.body()
 
     if (!request.hasBody) {
