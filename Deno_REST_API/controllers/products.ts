@@ -43,10 +43,36 @@ let products: Product[] = [
 
 // @desc    Get all products
 // @route   GET /api/v1/products
-const getProducts = ({ response }: { response: any }) => {
-    response.body = {
-        success     : true,
-        data        : products
+const getProducts = async ({ response }: { response: any }) => {
+    try{
+        await client.connect()
+
+        const result   = await client.query("SELECT * FROM products")
+        const products = new Array()
+
+        result.rows.map(p => {
+            let obj: any = new Object()
+
+            result.rowDescription.columns.map((el, i) => {
+                obj[el.name] = p[i]
+            })
+            products.push(obj)
+        })
+
+        response.body = {
+            success : true,
+            data    : products
+        }
+    }
+    catch (err) {
+        response.status = 500
+        response.body   = {
+            success : true,
+            mesg    : err.toString()
+        }
+    }
+    finally {
+        await client.end()
     }
 }
 
@@ -102,8 +128,8 @@ const addProduct = async ({ request, response }: { request: any, response: any }
         catch (err) {
             response      = 500
             response.body = {
-                success       : false,
-                msg           : err.toString()
+                success : false,
+                msg     : err.toString()
             }
 
         }
