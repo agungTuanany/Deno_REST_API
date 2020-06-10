@@ -65,8 +65,8 @@ const getProduct = ({ params, response }: { params: { id: string }, response: an
 
 // @desc    Add product
 // @route   POST /api/v1/products
-const addProduct = async ({ request, response }: { request: any, response: any }) => {
-    const body = await request.body()
+const addProduct = async ({ request, response }: { request: any, response: any }) = > {
+    const body   = await request.body()
 
     if (!request.hasBody) {
         response.status = 404
