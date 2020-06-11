@@ -17,22 +17,22 @@ const client = new Client(dbCreds)
 
 let products: Product[] = [
     {
-        id              : '1',
-        name            : "Product One",
-        description     : "This is product one",
-        price           : 19.99,
+        id          : '1',
+        name        : "Product One",
+        description : "This is product one",
+        price       : 19.99,
     },
     {
-        id              : '2',
-        name            : "Product Two",
-        description     : "This is product two",
-        price           : 19.99,
+        id          : '2',
+        name        : "Product Two",
+        description : "This is product two",
+        price       : 19.99,
     },
     {
-        id              : '3',
-        name            : "Product Three",
-        description     : "This is product three",
-        price           : 19.99,
+        id          : '3',
+        name        : "Product Three",
+        description : "This is product three",
+        price       : 19.99,
     }
 ]
 
@@ -67,8 +67,8 @@ const getProducts = async ({ response }: { response: any }) => {
     catch (err) {
         response.status = 500
         response.body   = {
-            success : true,
-            mesg    : err.toString()
+            success : false,
+            msg     : err.toString()
         }
     }
     finally {
@@ -78,23 +78,49 @@ const getProducts = async ({ response }: { response: any }) => {
 
 // @desc    Get single product
 // @route   GET /api/v1/products/:id
-const getProduct = ({ params, response }: { params: { id: string }, response: any }) => {
-    const product: Product | undefined = products.find(p => p.id === params.id)
+const getProduct = async ({ params, response }: { params: { id: string }, response: any }) => {
+    try {
+        await client.connect()
 
-    if (!product) {
-        response.status = 404
-        response.body   = {
-            success : false,
-            msg     : "No product found"
+        const result = await client.query("SELECT * FROM products WHERE product_id = $1", params.id)
+        console.log (result)
+
+        if (result.rows.toString() === "") {
+            response.status = 404
+            response.body   = {
+                success : false,
+                msg     : `No product with the id of ${params.id}`
+            }
+
+            return
+        }
+        else {
+            const product: any = new Object()
+
+            result.rows.map(p => {
+                result.rowDescription.columns.map((el, i) => {
+                    product[el.name] = p[i]
+                })
+            })
+
+            response.body = {
+                success : true,
+                data    : product
+            }
         }
     }
-    else {
-        response.status = 200
+    catch (err) {
+        response.status = 500
         response.body   = {
-            success : true,
-            data    : product
+        success: false,
+        msg  : err.toString(),
+        msg2 : "some trouble with your query"
         }
     }
+    finally {
+        await client.end()
+    }
+
 }
 
 // @desc    Add product
